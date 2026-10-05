@@ -1,0 +1,199 @@
+.payment-page {
+  min-height: calc(100vh - 72px);
+
+  display: flex;
+  justify-content: center;
+
+  padding: 60px 20px;
+}
+
+.payment-container {
+  width: 100%;
+  max-width: 650px;
+
+  background: white;
+
+  padding: 40px;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.07);
+}
+
+.payment-header p {
+  color: #16a34a;
+
+  font-size: 12px;
+  font-weight: bold;
+
+  letter-spacing: 2px;
+
+  margin-bottom: 8px;
+}
+
+.payment-header h1 {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.payment-header span {
+  color: #6b7280;
+}
+
+/* SUMMARY */
+
+.payment-summary {
+  margin-top: 30px;
+
+  padding: 20px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: #111111;
+
+  color: white;
+
+  border-radius: 12px;
+}
+
+.payment-summary p {
+  color: #aaaaaa;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.payment-summary h2 {
+  color: #16a34a;
+}
+
+.payment-summary > span {
+  color: #cccccc;
+  font-size: 13px;
+}
+
+/* PAYMENT OPTIONS */
+
+.payment-options {
+  margin-top: 25px;
+}
+
+.payment-card {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 20px;
+
+  margin-bottom: 15px;
+
+  border: 2px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.payment-card:hover {
+  border-color: #16a34a;
+}
+
+.payment-card.selected {
+  border-color: #16a34a;
+
+  background: #eaf7ef;
+}
+
+.payment-icon {
+  width: 50px;
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #111111;
+
+  color: #16a34a;
+
+  border-radius: 10px;
+
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.payment-info {
+  flex: 1;
+}
+
+.payment-info h2 {
+  font-size: 17px;
+  margin-bottom: 5px;
+}
+
+.payment-info p {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.payment-radio {
+  width: 25px;
+  height: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #d1d5db;
+
+  border-radius: 50%;
+
+  color: white;
+
+  font-weight: bold;
+}
+
+.payment-card.selected .payment-radio {
+  background: #16a34a;
+  border-color: #16a34a;
+}
+
+/* BUTTON */
+
+.continue-button {
+  width: 100%;
+
+  margin-top: 10px;
+
+  padding: 15px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #16a34a;
+  color: white;
+
+  font-size: 15px;
+  font-weight: bold;
+
+  transition: 0.2s;
+}
+
+.continue-button:hover {
+  background: #0b6b32;
+}
+
+.secure-text {
+  text-align: center;
+
+  margin-top: 18px;
+
+  color: #6b7280;
+
+  font-size: 12px;
+}

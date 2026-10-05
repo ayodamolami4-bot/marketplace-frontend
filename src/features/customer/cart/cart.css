@@ -1,0 +1,166 @@
+.cart-page {
+  padding: 50px 8%;
+}
+
+.cart-header p {
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.cart-header h1 {
+  font-size: 35px;
+  margin-top: 8px;
+}
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 30px;
+  margin-top: 35px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding: 20px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+}
+
+.cart-image {
+  width: 120px;
+  height: 120px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #eaf7ef;
+
+  border-radius: 10px;
+
+  font-size: 45px;
+}
+
+.cart-info {
+  flex: 1;
+}
+
+.cart-info p {
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.cart-info h2 {
+  font-size: 18px;
+  margin: 8px 0;
+}
+
+.cart-info > span {
+  font-weight: bold;
+}
+
+.quantity {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  margin-top: 15px;
+}
+
+.quantity button {
+  width: 30px;
+  height: 30px;
+
+  border: 1px solid #ddd;
+
+  background: white;
+
+  border-radius: 5px;
+}
+
+.remove-button {
+  border: none;
+  background: none;
+
+  color: #dc2626;
+
+  font-size: 13px;
+}
+
+.cart-summary {
+  padding: 25px;
+
+  background: #111111;
+  color: white;
+
+  border-radius: 14px;
+
+  height: fit-content;
+}
+
+.cart-summary h2 {
+  margin-bottom: 25px;
+}
+
+.summary-row,
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+
+  margin-bottom: 15px;
+}
+
+.summary-row {
+  color: #cccccc;
+  font-size: 14px;
+}
+
+.summary-line {
+  height: 1px;
+
+  background: #333333;
+
+  margin: 20px 0;
+}
+
+.summary-total strong {
+  color: #16a34a;
+  font-size: 20px;
+}
+
+.checkout-button {
+  display: block;
+
+  text-align: center;
+
+  padding: 14px;
+
+  margin-top: 25px;
+
+  background: #16a34a;
+  color: white;
+
+  border-radius: 7px;
+
+  font-weight: bold;
+}
+
+.checkout-button:hover {
+  background: #22c55e;
+}
+
+@media (max-width: 800px) {
+  .cart-layout {
+    grid-template-columns: 1fr;
+  }
+}
