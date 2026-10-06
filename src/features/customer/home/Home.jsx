@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { apiRequest } from "../../../services/api";
+import { productImage } from "../../../utils/productImage";
 import "./home.css";
 
 const categoryVisuals = [
@@ -16,7 +17,6 @@ const categoryVisuals = [
   },
   {
     name: "Home & Living",
-    query: "Home",
     image:
       "https://images.unsplash.com/photo-1484101403633-562f891dc89a?auto=format&fit=crop&w=500&q=80",
   },
@@ -29,11 +29,6 @@ const categoryVisuals = [
     name: "Groceries",
     image:
       "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    name: "Health",
-    image:
-      "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=500&q=80",
   },
   {
     name: "Sports",
@@ -51,36 +46,60 @@ function money(value = 0) {
 }
 
 function Home() {
+  const navigate = useNavigate();
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [savedIds, setSavedIds] = useState(new Set());
+  const [busyId, setBusyId] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     let active = true;
 
     async function loadHome() {
-      try {
-        setLoading(true);
-        const [productResponse, categoryResponse] = await Promise.all([
-          apiRequest("/products?page=1&pageSize=6&sort=newest"),
-          apiRequest("/categories"),
-        ]);
+      setLoading(true);
 
-        if (!active) return;
+      const [productResult, categoryResult] = await Promise.allSettled([
+        apiRequest("/products?page=1&pageSize=6&sort=newest"),
+        apiRequest("/categories"),
+      ]);
 
-        setProducts(productResponse?.data || []);
-        setCategories(categoryResponse?.data || []);
+      if (!active) return;
+
+      if (productResult.status === "fulfilled") {
+        setProducts(productResult.value?.data || []);
         setError("");
-      } catch (requestError) {
+      } else {
+        setError(productResult.reason?.message || "Could not load products.");
+      }
+
+      if (categoryResult.status === "fulfilled") {
+        setCategories(categoryResult.value?.data || []);
+      }
+
+      setLoading(false);
+    }
+
+    async function loadWishlist() {
+      if (!localStorage.getItem("marketplace_token")) return;
+
+      try {
+        const response = await apiRequest("/wishlist");
         if (!active) return;
-        setError(requestError.message || "Could not load marketplace");
-      } finally {
-        if (active) setLoading(false);
+
+        setSavedIds(
+          new Set((response?.data || []).map((item) => item.productId))
+        );
+      } catch {
+        // Authentication handling is centralized in apiRequest.
       }
     }
 
     loadHome();
+    loadWishlist();
 
     return () => {
       active = false;
@@ -90,19 +109,85 @@ function Home() {
   const visibleCategories = useMemo(() => {
     if (!categories.length) return categoryVisuals;
 
-    return categoryVisuals.map((visual) => {
-      const match = categories.find(
+    return categoryVisuals.filter((visual) =>
+      categories.some(
         (category) =>
-          category.name?.toLowerCase() ===
-          (visual.query || visual.name).toLowerCase()
-      );
-
-      return {
-        ...visual,
-        query: match?.name || visual.query || visual.name,
-      };
-    });
+          String(category.name).toLowerCase() === visual.name.toLowerCase()
+      )
+    );
   }, [categories]);
+
+  function requireLogin(from = "/") {
+    if (localStorage.getItem("marketplace_token")) {
+      return true;
+    }
+
+    navigate("/login", { state: { from } });
+    return false;
+  }
+
+  async function toggleWishlist(event, productId) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!requireLogin("/")) return;
+
+    try {
+      setBusyId(productId);
+      setNotice("");
+
+      const saved = savedIds.has(productId);
+
+      if (saved) {
+        await apiRequest(`/wishlist/${productId}`, { method: "DELETE" });
+      } else {
+        await apiRequest("/wishlist", {
+          method: "POST",
+          body: JSON.stringify({ productId }),
+        });
+      }
+
+      setSavedIds((current) => {
+        const next = new Set(current);
+
+        if (saved) next.delete(productId);
+        else next.add(productId);
+
+        return next;
+      });
+
+      setNotice(saved ? "Removed from wishlist." : "Saved to wishlist.");
+      window.dispatchEvent(new Event("marketplace:wishlist-updated"));
+    } catch (requestError) {
+      setNotice(requestError.message || "Could not update wishlist.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  async function addToCart(productId) {
+    if (!requireLogin("/")) return;
+
+    try {
+      setBusyId(productId);
+      setNotice("");
+
+      await apiRequest("/cart/items", {
+        method: "POST",
+        body: JSON.stringify({
+          productId,
+          quantity: 1,
+        }),
+      });
+
+      setNotice("Product added to cart.");
+      window.dispatchEvent(new Event("marketplace:cart-updated"));
+    } catch (requestError) {
+      setNotice(requestError.message || "Could not add product to cart.");
+    } finally {
+      setBusyId("");
+    }
+  }
 
   return (
     <div className="market-home">
@@ -136,7 +221,7 @@ function Home() {
           <span className="trust-icon">✓</span>
           <div>
             <strong>Secure Payments</strong>
-            <small>Safe transactions</small>
+            <small>Protected checkout</small>
           </div>
         </div>
 
@@ -144,23 +229,23 @@ function Home() {
           <span className="trust-icon">✓</span>
           <div>
             <strong>Verified Vendors</strong>
-            <small>Trusted sellers</small>
+            <small>Approved sellers</small>
           </div>
         </div>
 
         <div className="trust-item">
-          <span className="trust-icon">⌁</span>
+          <span className="trust-icon">→</span>
           <div>
-            <strong>Fast Delivery</strong>
-            <small>Across Nigeria</small>
+            <strong>Order Tracking</strong>
+            <small>Follow fulfillment</small>
           </div>
         </div>
 
         <div className="trust-item">
-          <span className="trust-icon">↻</span>
+          <span className="trust-icon">✓</span>
           <div>
-            <strong>Easy Returns</strong>
-            <small>Hassle-free support</small>
+            <strong>Multiple Sellers</strong>
+            <small>One marketplace account</small>
           </div>
         </div>
       </section>
@@ -175,9 +260,7 @@ function Home() {
           {visibleCategories.map((category) => (
             <Link
               key={category.name}
-              to={`/products?category=${encodeURIComponent(
-                category.query || category.name
-              )}`}
+              to={`/products?category=${encodeURIComponent(category.name)}`}
               className="category-tile"
             >
               <div className="category-image-wrap">
@@ -189,7 +272,7 @@ function Home() {
 
           <Link to="/products" className="category-tile category-more">
             <div className="category-image-wrap category-more-circle">
-              <span>•••</span>
+              <span>...</span>
             </div>
             <span>More</span>
           </Link>
@@ -202,6 +285,8 @@ function Home() {
           <Link to="/products">View All →</Link>
         </div>
 
+        {notice && <div className="market-action-notice">{notice}</div>}
+
         {loading ? (
           <div className="home-product-grid">
             {Array.from({ length: 6 }).map((_, index) => (
@@ -212,54 +297,70 @@ function Home() {
           <div className="empty-state">{error}</div>
         ) : products.length ? (
           <div className="home-product-grid">
-            {products.map((product) => (
-              <article className="home-product-card" key={product.id}>
-                <Link
-                  to={`/products/${product.id}`}
-                  className="home-product-image"
-                >
-                  {product.thumbnail ? (
-                    <img src={product.thumbnail} alt={product.name} />
-                  ) : (
-                    <div className="image-fallback">No image</div>
-                  )}
+            {products.map((product) => {
+              const saved = savedIds.has(product.id);
 
-                  <button
-                    type="button"
-                    className="heart-button"
-                    aria-label={`Save ${product.name}`}
-                    onClick={(event) => event.preventDefault()}
-                  >
-                    ♡
-                  </button>
-                </Link>
-
-                <div className="home-product-body">
+              return (
+                <article className="home-product-card" key={product.id}>
                   <Link
                     to={`/products/${product.id}`}
-                    className="home-product-name"
+                    className="home-product-image"
                   >
-                    {product.name}
+                    <img src={productImage(product)} alt={product.name} />
+
+                    <button
+                      type="button"
+                      className={saved ? "heart-button saved" : "heart-button"}
+                      aria-label={
+                        saved
+                          ? `Remove ${product.name} from wishlist`
+                          : `Save ${product.name} to wishlist`
+                      }
+                      disabled={busyId === product.id}
+                      onClick={(event) =>
+                        toggleWishlist(event, product.id)
+                      }
+                    >
+                      {saved ? "\u2665" : "\u2661"}
+                    </button>
                   </Link>
 
-                  <strong className="home-product-price">
-                    {money(product.price)}
-                  </strong>
+                  <div className="home-product-body">
+                    <Link
+                      to={`/products/${product.id}`}
+                      className="home-product-name"
+                    >
+                      {product.name}
+                    </Link>
 
-                  <div className="home-product-meta">
-                    <span>★ {product.avgRating?.toFixed?.(1) || "New"}</span>
-                    <small>{product.vendor?.name || "Marketplace vendor"}</small>
+                    <strong className="home-product-price">
+                      {money(product.price)}
+                    </strong>
+
+                    <div className="home-product-meta">
+                      <span>
+                        ★{" "}
+                        {product.avgRating
+                          ? Number(product.avgRating).toFixed(1)
+                          : "New"}
+                      </span>
+                      <small>
+                        {product.vendor?.name || "Marketplace vendor"}
+                      </small>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="add-cart-link"
+                      disabled={busyId === product.id}
+                      onClick={() => addToCart(product.id)}
+                    >
+                      {busyId === product.id ? "Working..." : "Add to Cart"}
+                    </button>
                   </div>
-
-                  <Link
-                    to={`/products/${product.id}`}
-                    className="add-cart-link"
-                  >
-                    Add to Cart
-                  </Link>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         ) : (
           <div className="empty-state">
