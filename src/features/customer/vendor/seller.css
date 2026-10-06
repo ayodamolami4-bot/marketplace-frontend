@@ -1,0 +1,235 @@
+.seller-page {
+  width: min(100% - 32px, 1180px);
+  margin: 0 auto;
+  padding: 28px 0 60px;
+}
+
+.seller-hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 230px;
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(8, 43, 30, 0.98),
+      rgba(8, 43, 30, 0.88) 50%,
+      rgba(8, 43, 30, 0.45)
+    ),
+    url("https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=82");
+  background-position: center;
+  background-size: cover;
+  color: white;
+}
+
+.seller-hero > div {
+  max-width: 650px;
+  padding: clamp(28px, 5vw, 52px);
+}
+
+.seller-hero .eyebrow {
+  color: #a9dbbb;
+}
+
+.seller-hero h1 {
+  margin-top: 7px;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+}
+
+.seller-hero p:last-child {
+  margin-top: 13px;
+  color: #d9e7de;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.seller-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(360px, 1.2fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.seller-steps,
+.seller-form-card,
+.seller-approved-card {
+  border: 1px solid #dfe6e1;
+  border-radius: 10px;
+  background: white;
+}
+
+.seller-steps {
+  padding: 20px;
+}
+
+.seller-steps > h2 {
+  margin-bottom: 8px;
+  font-size: 0.92rem;
+}
+
+.seller-steps > div:not(.seller-note) {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 11px;
+  padding: 15px 0;
+  border-bottom: 1px solid #e9edea;
+}
+
+.seller-steps > div > span {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #eaf7ef;
+  color: #178648;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.seller-steps p {
+  display: grid;
+  gap: 4px;
+}
+
+.seller-steps strong {
+  font-size: 0.72rem;
+}
+
+.seller-steps small {
+  color: #758178;
+  font-size: 0.65rem;
+  line-height: 1.45;
+}
+
+.seller-note {
+  margin-top: 16px;
+  border-radius: 7px;
+  background: #f3f7f4;
+  color: #69766e;
+  padding: 12px;
+  font-size: 0.64rem;
+  line-height: 1.5;
+}
+
+.seller-form-card {
+  display: grid;
+  gap: 15px;
+  padding: 22px;
+}
+
+.seller-form-card h2 {
+  margin-top: 4px;
+  font-size: 1.2rem;
+}
+
+.seller-form-card label {
+  display: grid;
+  gap: 6px;
+  color: #536159;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.seller-form-card input,
+.seller-form-card textarea {
+  width: 100%;
+  border: 1px solid #d5ded8;
+  border-radius: 7px;
+  outline: 0;
+  background: white;
+  padding: 11px 12px;
+  color: #203028;
+  font: inherit;
+  font-size: 0.76rem;
+  resize: vertical;
+}
+
+.seller-form-card input:focus,
+.seller-form-card textarea:focus {
+  border-color: #23a95c;
+  box-shadow: 0 0 0 3px rgba(35, 169, 92, 0.09);
+}
+
+.seller-form-card > button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 7px;
+  background: #20a75a;
+  color: white;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.seller-form-card > p:last-child {
+  color: #849089;
+  font-size: 0.61rem;
+  line-height: 1.5;
+}
+
+.seller-approved-card {
+  max-width: 720px;
+  margin: 50px auto;
+  padding: 42px;
+  text-align: center;
+}
+
+.seller-approved-mark {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: #e5f7ec;
+  color: #178648;
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+.seller-approved-card h1 {
+  margin-top: 7px;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  letter-spacing: -0.04em;
+}
+
+.seller-approved-card > p:not(.eyebrow) {
+  max-width: 580px;
+  margin: 12px auto 22px;
+  color: #6f7b74;
+  line-height: 1.6;
+}
+
+.seller-approved-card > a {
+  display: inline-flex;
+  border-radius: 7px;
+  background: #20a75a;
+  color: white;
+  padding: 11px 17px;
+  font-size: 0.73rem;
+  font-weight: 900;
+}
+
+.seller-approved-card.pending .seller-approved-mark {
+  background: #fff6dd;
+  color: #946600;
+}
+
+@media (max-width: 760px) {
+  .seller-page {
+    width: min(100% - 20px, 1180px);
+  }
+
+  .seller-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-approved-card {
+    margin: 25px auto;
+    padding: 28px 20px;
+  }
+}
