@@ -1,292 +1,203 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
+import { apiRequest } from "../../../services/api";
+import { productImage } from "../../../utils/productImage";
 import "./products.css";
 
-
-const products = [
-  {
-    id: 1,
-    name: "Wireless Headphones",
-    price: 45000,
-    category: "Electronics",
-    rating: 4.8,
-  },
-  {
-    id: 2,
-    name: "Smart Watch",
-    price: 35000,
-    category: "Electronics",
-    rating: 4.6,
-  },
-  {
-    id: 3,
-    name: "Premium Sneakers",
-    price: 55000,
-    category: "Fashion",
-    rating: 4.9,
-  },
-  {
-    id: 4,
-    name: "Travel Backpack",
-    price: 30000,
-    category: "Fashion",
-    rating: 4.7,
-  },
-];
+function money(value = 0) {
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    maximumFractionDigits: 0,
+  }).format(value / 100);
+}
 
 function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [searchText, setSearchText] = useState(
-    searchParams.get("search") || ""
-  );
+  const q = searchParams.get("q") || "";
+  const category = searchParams.get("category") || "";
+  const sort = searchParams.get("sort") || "newest";
 
   useEffect(() => {
-    setSearchText(searchParams.get("search") || "");
-  }, [searchParams]);
+    let active = true;
 
-  function handleSearch(event) {
-    const value = event.target.value;
+    async function loadProducts() {
+      try {
+        setLoading(true);
 
-    setSearchText(value);
+        const params = new URLSearchParams({
+          page: "1",
+          pageSize: "60",
+          sort,
+        });
 
-    if (value.trim() === "") {
-      setSearchParams({});
-    } else {
-      setSearchParams({
-        search: value,
-      });
+        if (q) params.set("q", q);
+        if (category) params.set("category", category);
+
+        const [productResponse, categoryResponse] = await Promise.all([
+          apiRequest(`/products?${params.toString()}`),
+          apiRequest("/categories"),
+        ]);
+
+        if (!active) return;
+
+        setProducts(productResponse?.data || []);
+        setCategories(categoryResponse?.data || []);
+        setError("");
+      } catch (requestError) {
+        if (!active) return;
+        setError(requestError.message || "Could not load products.");
+      } finally {
+        if (active) setLoading(false);
+      }
     }
+
+    loadProducts();
+
+    return () => {
+      active = false;
+    };
+  }, [q, category, sort]);
+
+  const title = useMemo(() => {
+    if (q) return `Results for “${q}”`;
+    if (category) return category;
+    return "All Products";
+  }, [q, category]);
+
+  function setParam(name, value) {
+    const next = new URLSearchParams(searchParams);
+
+    if (value) next.set(name, value);
+    else next.delete(name);
+
+    setSearchParams(next);
   }
-
-  function clearSearch() {
-    setSearchText("");
-    setSearchParams({});
-  }
-
-  const filteredProducts = products.filter((product) => {
-    const search = searchText.toLowerCase();
-
-    return (
-      product.name.toLowerCase().includes(search) ||
-      product.category.toLowerCase().includes(search)
-    );
-  });
 
   return (
-    <div className="products-page">
-
-      <section className="hero-section">
-
-        <div className="hero-content">
-
-          <p className="hero-small">
-            WELCOME TO MARKETPLACE
-          </p>
-
-          <h1>
-            Shop smarter.
-            <br />
-            Live better.
-          </h1>
-
-          <p>
-            Find quality products at great prices and enjoy a simple
-            shopping experience.
-          </p>
-
-          <Link to="/products" className="hero-button">
-            Shop Now
-          </Link>
-
+    <div className="catalog-page">
+      <div className="catalog-heading">
+        <div>
+          <p className="eyebrow">MARKETPLACE</p>
+          <h1>{title}</h1>
+          <p>{loading ? "Loading..." : `${products.length} products found`}</p>
         </div>
 
-        <div className="hero-design">
+        <select
+          value={sort}
+          onChange={(event) => setParam("sort", event.target.value)}
+          className="catalog-sort"
+        >
+          <option value="newest">Newest</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+          <option value="oldest">Oldest</option>
+        </select>
+      </div>
 
-          <div className="hero-circle"></div>
+      <div className="catalog-layout">
+        <aside className="catalog-filters">
+          <div className="filter-block">
+            <div className="filter-title">
+              <strong>Categories</strong>
+              {(category || q) && (
+                <button
+                  type="button"
+                  onClick={() => setSearchParams({ sort })}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
 
-          <div className="hero-box">
-            🛍️
-          </div>
-
-        </div>
-
-      </section>
-
-      <section className="search-section">
-
-        <div className="search-container">
-
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchText}
-            onChange={handleSearch}
-          />
-
-          <button type="button">
-            Search
-          </button>
-
-        </div>
-
-      </section>
-
-      <section className="category-section">
-
-        <h2>Shop by Category</h2>
-
-        <p>Find what you need quickly.</p>
-
-        <div className="category-list">
-
-          <button onClick={clearSearch}>
-            All
-          </button>
-
-          <button
-            onClick={() =>
-              setSearchParams({ search: "Electronics" })
-            }
-          >
-            Electronics
-          </button>
-
-          <button
-            onClick={() =>
-              setSearchParams({ search: "Fashion" })
-            }
-          >
-            Fashion
-          </button>
-
-          <button
-            onClick={() =>
-              setSearchParams({ search: "Beauty" })
-            }
-          >
-            Beauty
-          </button>
-
-          <button
-            onClick={() =>
-              setSearchParams({ search: "Home" })
-            }
-          >
-            Home
-          </button>
-
-        </div>
-
-      </section>
-
-      <section className="products-section">
-
-        <div className="section-heading">
-
-          <div>
-
-            <h2>
-              {searchText
-                ? `Search results for "${searchText}"`
-                : "Popular Products"}
-            </h2>
-
-            <p>
-              {filteredProducts.length} product
-              {filteredProducts.length !== 1 ? "s" : ""} found
-            </p>
-
-          </div>
-
-        </div>
-
-        {filteredProducts.length > 0 ? (
-
-          <div className="product-grid">
-
-            {filteredProducts.map((product) => (
-
-              <div
-                className="product-card"
-                key={product.id}
-              >
-
-                <div className="product-image">
-
-                  <span className="product-placeholder">
-                    🛍️
-                  </span>
-
-                  <span className="product-badge">
-                    Popular
-                  </span>
-
-                  <button className="wishlist-button">
-                    ♡
-                  </button>
-
-                </div>
-
-                <div className="product-content">
-
-                  <p className="product-category">
-                    {product.category}
-                  </p>
-
-                  <h2>
-                    {product.name}
-                  </h2>
-
-                  <div className="rating">
-                    ★ {product.rating}
-                  </div>
-
-                  <div className="product-bottom">
-
-                    <p className="product-price">
-                      ₦{product.price.toLocaleString()}
-                    </p>
-
-                    <Link
-                      to={`/products/${product.id}`}
-                      className="product-button"
-                    >
-                      View
-                    </Link>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            ))}
-
-          </div>
-
-        ) : (
-
-          <div className="no-products">
-
-            <h2>
-              No products found
-            </h2>
-
-            <p>
-              Try searching for another product.
-            </p>
-
-            <button onClick={clearSearch}>
-              Show All Products
+            <button
+              type="button"
+              className={!category ? "filter-option active" : "filter-option"}
+              onClick={() => setParam("category", "")}
+            >
+              All Products
             </button>
 
+            {categories.map((item) => (
+              <button
+                type="button"
+                key={item.id}
+                className={
+                  category === item.name
+                    ? "filter-option active"
+                    : "filter-option"
+                }
+                onClick={() => setParam("category", item.name)}
+              >
+                {item.name}
+              </button>
+            ))}
           </div>
+        </aside>
 
-        )}
+        <section className="catalog-results">
+          {error && <div className="form-error">{error}</div>}
 
-      </section>
+          {loading ? (
+            <div className="catalog-grid">
+              {Array.from({ length: 12 }).map((_, index) => (
+                <div className="catalog-skeleton" key={index} />
+              ))}
+            </div>
+          ) : products.length ? (
+            <div className="catalog-grid">
+              {products.map((product) => (
+                <article className="catalog-card" key={product.id}>
+                  <Link
+                    to={`/products/${product.id}`}
+                    className="catalog-image"
+                  >
+                    <img src={productImage(product)} alt={product.name} />
+                    <span className="catalog-category">{product.category}</span>
+                    <button
+                      type="button"
+                      className="catalog-heart"
+                      aria-label={`Save ${product.name}`}
+                      onClick={(event) => event.preventDefault()}
+                    >
+                      ♡
+                    </button>
+                  </Link>
 
+                  <div className="catalog-card-body">
+                    <small>{product.vendor?.name || "Marketplace vendor"}</small>
+
+                    <Link to={`/products/${product.id}`}>
+                      <h2>{product.name}</h2>
+                    </Link>
+
+                    <div className="catalog-rating">
+                      <span>★</span>
+                      {product.avgRating
+                        ? Number(product.avgRating).toFixed(1)
+                        : "New"}
+                    </div>
+
+                    <div className="catalog-card-bottom">
+                      <strong>{money(product.price)}</strong>
+                      <Link to={`/products/${product.id}`}>View</Link>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              No products match this search yet.
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
