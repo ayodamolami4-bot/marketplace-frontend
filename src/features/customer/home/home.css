@@ -159,7 +159,7 @@
 
 .category-showcase {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -206,6 +206,17 @@
   padding-top: 27px;
 }
 
+.market-action-notice {
+  margin-bottom: 12px;
+  border: 1px solid #c5e8d1;
+  border-radius: 7px;
+  background: #f0faf4;
+  color: #176f40;
+  padding: 9px 11px;
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
 .home-product-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -241,15 +252,6 @@
   object-fit: cover;
 }
 
-.image-fallback {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  color: #7b877f;
-  font-size: 0.75rem;
-}
-
 .heart-button {
   position: absolute;
   top: 8px;
@@ -261,6 +263,11 @@
   background: rgba(255, 255, 255, 0.95);
   color: #435148;
   font-size: 1rem;
+}
+
+.heart-button.saved {
+  border-color: #b9dec6;
+  color: #15944e;
 }
 
 .home-product-body {
@@ -302,8 +309,10 @@
 }
 
 .add-cart-link {
+  width: 100%;
   display: block;
   margin-top: 1px;
+  border: 0;
   padding: 7px 6px;
   border-radius: 5px;
   background: #1faa59;
@@ -328,12 +337,8 @@
 }
 
 @keyframes market-skeleton {
-  0% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0 50%;
-  }
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
 }
 
 @media (max-width: 1080px) {
