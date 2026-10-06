@@ -5,7 +5,7 @@
 }
 
 .market-hero {
-  min-height: 312px;
+  min-height: 252px;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -47,7 +47,7 @@
 
 .market-hero-copy {
   width: min(600px, 58%);
-  padding: clamp(34px, 5vw, 66px);
+  padding: clamp(28px, 4vw, 48px);
   color: white;
 }
 
@@ -61,14 +61,14 @@
 
 .market-hero h1 {
   max-width: 620px;
-  font-size: clamp(2.5rem, 4.8vw, 4.7rem);
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
   line-height: 0.98;
   letter-spacing: -0.05em;
 }
 
 .market-hero-description {
   max-width: 510px;
-  margin-top: 18px;
+  margin-top: 14px;
   color: #e1ebe4;
   font-size: 0.95rem;
   line-height: 1.55;
@@ -78,7 +78,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 24px;
+  margin-top: 18px;
   padding: 11px 19px;
   border-radius: 7px;
   background: #2fbd68;
@@ -353,7 +353,7 @@
   }
 
   .market-hero {
-    min-height: 350px;
+    min-height: 300px;
   }
 
   .market-hero-media {
