@@ -1,0 +1,145 @@
+.vendor-app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  background: #f4f6f4;
+}
+
+.vendor-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 14px 16px;
+  background:
+    linear-gradient(rgba(8, 34, 24, 0.94), rgba(8, 34, 24, 0.97)),
+    url("https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=80");
+  background-size: cover;
+  background-position: center;
+  color: white;
+}
+
+.vendor-brand {
+  padding: 0 10px 24px;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.vendor-brand span {
+  color: #39cd79;
+}
+
+.vendor-brand small {
+  display: block;
+  margin-top: 4px;
+  color: #a9beb1;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vendor-nav {
+  display: grid;
+  gap: 4px;
+}
+
+.vendor-nav a {
+  padding: 11px 12px;
+  border-radius: 7px;
+  color: #bfccc4;
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.vendor-nav a:hover,
+.vendor-nav a.active {
+  background: rgba(71, 205, 125, 0.13);
+  color: white;
+}
+
+.vendor-nav a.active {
+  box-shadow: inset 3px 0 #39cd79;
+}
+
+.vendor-sidebar-user {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.vendor-sidebar-user > div {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #2fbf6b;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.vendor-sidebar-user > span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.vendor-sidebar-user strong {
+  font-size: 0.69rem;
+}
+
+.vendor-sidebar-user small {
+  overflow: hidden;
+  color: #9eb1a6;
+  font-size: 0.55rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vendor-main {
+  min-width: 0;
+  min-height: 100vh;
+  padding: 28px clamp(18px, 3vw, 42px) 50px;
+}
+
+@media (max-width: 780px) {
+  .vendor-app {
+    grid-template-columns: 1fr;
+  }
+
+  .vendor-sidebar {
+    position: static;
+    height: auto;
+    padding: 15px 14px;
+  }
+
+  .vendor-brand {
+    padding-bottom: 12px;
+  }
+
+  .vendor-nav {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .vendor-nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .vendor-sidebar-user {
+    display: none;
+  }
+
+  .vendor-main {
+    padding: 20px 14px 40px;
+  }
+}
