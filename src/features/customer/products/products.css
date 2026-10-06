@@ -154,6 +154,11 @@
   color: #39473f;
 }
 
+.catalog-heart.saved {
+  border-color: #b9dec6;
+  color: #15944e;
+}
+
 .catalog-card-body {
   display: grid;
   gap: 6px;
