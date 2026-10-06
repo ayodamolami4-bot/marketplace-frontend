@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { apiRequest } from "../../../services/api";
 import { productImage } from "../../../utils/productImage";
 import "./products.css";
@@ -13,9 +13,13 @@ function money(value = 0) {
 }
 
 function Products() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [savedIds, setSavedIds] = useState(new Set());
+  const [busyId, setBusyId] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -27,34 +31,39 @@ function Products() {
     let active = true;
 
     async function loadProducts() {
-      try {
-        setLoading(true);
+      setLoading(true);
 
-        const params = new URLSearchParams({
-          page: "1",
-          pageSize: "60",
-          sort,
-        });
+      const params = new URLSearchParams({
+        page: "1",
+        pageSize: "60",
+        sort,
+      });
 
-        if (q) params.set("q", q);
-        if (category) params.set("category", category);
+      if (q) params.set("q", q);
+      if (category) params.set("category", category);
 
-        const [productResponse, categoryResponse] = await Promise.all([
-          apiRequest(`/products?${params.toString()}`),
-          apiRequest("/categories"),
-        ]);
+      const [productResult, categoryResult] = await Promise.allSettled([
+        apiRequest(`/products?${params.toString()}`),
+        apiRequest("/categories"),
+      ]);
 
-        if (!active) return;
+      if (!active) return;
 
-        setProducts(productResponse?.data || []);
-        setCategories(categoryResponse?.data || []);
+      if (productResult.status === "fulfilled") {
+        setProducts(productResult.value?.data || []);
         setError("");
-      } catch (requestError) {
-        if (!active) return;
-        setError(requestError.message || "Could not load products.");
-      } finally {
-        if (active) setLoading(false);
+      } else {
+        setProducts([]);
+        setError(
+          productResult.reason?.message || "Could not load products."
+        );
       }
+
+      if (categoryResult.status === "fulfilled") {
+        setCategories(categoryResult.value?.data || []);
+      }
+
+      setLoading(false);
     }
 
     loadProducts();
@@ -64,8 +73,37 @@ function Products() {
     };
   }, [q, category, sort]);
 
+  useEffect(() => {
+    let active = true;
+
+    async function loadWishlist() {
+      if (!localStorage.getItem("marketplace_token")) {
+        setSavedIds(new Set());
+        return;
+      }
+
+      try {
+        const response = await apiRequest("/wishlist");
+
+        if (!active) return;
+
+        setSavedIds(
+          new Set((response?.data || []).map((item) => item.productId))
+        );
+      } catch {
+        // Authentication handling is centralized in apiRequest.
+      }
+    }
+
+    loadWishlist();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const title = useMemo(() => {
-    if (q) return `Results for “${q}”`;
+    if (q) return `Results for "${q}"`;
     if (category) return category;
     return "All Products";
   }, [q, category]);
@@ -77,6 +115,48 @@ function Products() {
     else next.delete(name);
 
     setSearchParams(next);
+  }
+
+  async function toggleWishlist(event, productId) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!localStorage.getItem("marketplace_token")) {
+      navigate("/login", {
+        state: { from: `/products?${searchParams.toString()}` },
+      });
+      return;
+    }
+
+    try {
+      setBusyId(productId);
+
+      const saved = savedIds.has(productId);
+
+      if (saved) {
+        await apiRequest(`/wishlist/${productId}`, { method: "DELETE" });
+      } else {
+        await apiRequest("/wishlist", {
+          method: "POST",
+          body: JSON.stringify({ productId }),
+        });
+      }
+
+      setSavedIds((current) => {
+        const next = new Set(current);
+
+        if (saved) next.delete(productId);
+        else next.add(productId);
+
+        return next;
+      });
+
+      window.dispatchEvent(new Event("marketplace:wishlist-updated"));
+    } catch (requestError) {
+      setError(requestError.message || "Could not update wishlist.");
+    } finally {
+      setBusyId("");
+    }
   }
 
   return (
@@ -151,45 +231,65 @@ function Products() {
             </div>
           ) : products.length ? (
             <div className="catalog-grid">
-              {products.map((product) => (
-                <article className="catalog-card" key={product.id}>
-                  <Link
-                    to={`/products/${product.id}`}
-                    className="catalog-image"
-                  >
-                    <img src={productImage(product)} alt={product.name} />
-                    <span className="catalog-category">{product.category}</span>
-                    <button
-                      type="button"
-                      className="catalog-heart"
-                      aria-label={`Save ${product.name}`}
-                      onClick={(event) => event.preventDefault()}
+              {products.map((product) => {
+                const saved = savedIds.has(product.id);
+
+                return (
+                  <article className="catalog-card" key={product.id}>
+                    <Link
+                      to={`/products/${product.id}`}
+                      className="catalog-image"
                     >
-                      ♡
-                    </button>
-                  </Link>
+                      <img src={productImage(product)} alt={product.name} />
+                      <span className="catalog-category">
+                        {product.category}
+                      </span>
 
-                  <div className="catalog-card-body">
-                    <small>{product.vendor?.name || "Marketplace vendor"}</small>
-
-                    <Link to={`/products/${product.id}`}>
-                      <h2>{product.name}</h2>
+                      <button
+                        type="button"
+                        className={
+                          saved
+                            ? "catalog-heart saved"
+                            : "catalog-heart"
+                        }
+                        aria-label={
+                          saved
+                            ? `Remove ${product.name} from wishlist`
+                            : `Save ${product.name} to wishlist`
+                        }
+                        disabled={busyId === product.id}
+                        onClick={(event) =>
+                          toggleWishlist(event, product.id)
+                        }
+                      >
+                        {saved ? "\u2665" : "\u2661"}
+                      </button>
                     </Link>
 
-                    <div className="catalog-rating">
-                      <span>★</span>
-                      {product.avgRating
-                        ? Number(product.avgRating).toFixed(1)
-                        : "New"}
-                    </div>
+                    <div className="catalog-card-body">
+                      <small>
+                        {product.vendor?.name || "Marketplace vendor"}
+                      </small>
 
-                    <div className="catalog-card-bottom">
-                      <strong>{money(product.price)}</strong>
-                      <Link to={`/products/${product.id}`}>View</Link>
+                      <Link to={`/products/${product.id}`}>
+                        <h2>{product.name}</h2>
+                      </Link>
+
+                      <div className="catalog-rating">
+                        <span>★</span>
+                        {product.avgRating
+                          ? Number(product.avgRating).toFixed(1)
+                          : "New"}
+                      </div>
+
+                      <div className="catalog-card-bottom">
+                        <strong>{money(product.price)}</strong>
+                        <Link to={`/products/${product.id}`}>View</Link>
+                      </div>
                     </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
             </div>
           ) : (
             <div className="empty-state">
