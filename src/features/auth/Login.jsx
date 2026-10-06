@@ -26,11 +26,9 @@ function Login() {
 
         <Link to="/forgot-password">
           Forgot password?
-        </Link>
+        </Link><br></br>
 
-        <p>
-          Don't have an account?
-        </p>
+       
 
         <Link to="/signup">
           Create account
