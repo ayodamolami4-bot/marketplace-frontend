@@ -18,6 +18,12 @@ import Notifications from "./features/customer/notifications/Notifications";
 import Tracking from "./features/customer/delivery/Tracking";
 import PickupLocations from "./features/customer/delivery/PickupLocations";
 
+import VendorLayout from "./layouts/VendorLayout";
+import VendorDashboard from "./features/vendor/VendorDashboard";
+import VendorProducts from "./features/vendor/VendorProducts";
+import VendorOrders from "./features/vendor/VendorOrders";
+import VendorFinance from "./features/vendor/VendorFinance";
+
 function App() {
   return (
     <Routes>
@@ -96,6 +102,20 @@ function App() {
           path="/pickup-locations"
           element={<PickupLocations />}
         />
+      </Route>
+
+      <Route
+        path="/vendor"
+        element={
+          <ProtectedRoute roles={["VENDOR"]}>
+            <VendorLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<VendorDashboard />} />
+        <Route path="products" element={<VendorProducts />} />
+        <Route path="orders" element={<VendorOrders />} />
+        <Route path="finance" element={<VendorFinance />} />
       </Route>
     </Routes>
   );
