@@ -139,6 +139,19 @@ function Payment() {
 
       localStorage.setItem("marketplace_last_order_id", response.orderId);
 
+      const savedOrderIds = JSON.parse(
+        localStorage.getItem("marketplace_order_ids") || "[]"
+      );
+
+      const nextOrderIds = Array.from(
+        new Set([response.orderId, ...savedOrderIds])
+      );
+
+      localStorage.setItem(
+        "marketplace_order_ids",
+        JSON.stringify(nextOrderIds)
+      );
+
       if (paymentMethod === "paystack" && response.paystack?.authorizationUrl) {
         window.location.assign(response.paystack.authorizationUrl);
         return;
