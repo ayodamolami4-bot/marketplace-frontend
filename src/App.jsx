@@ -17,6 +17,7 @@ import Reviews from "./features/customer/reviews/Reviews";
 import Notifications from "./features/customer/notifications/Notifications";
 import Tracking from "./features/customer/delivery/Tracking";
 import PickupLocations from "./features/customer/delivery/PickupLocations";
+import BecomeSeller from "./features/customer/vendor/BecomeSeller";
 
 import VendorLayout from "./layouts/VendorLayout";
 import VendorDashboard from "./features/vendor/VendorDashboard";
@@ -106,9 +107,24 @@ function App() {
         />
 
         <Route
-          path="/pickup-locations"
-          element={<PickupLocations />}
+          path="/sell"
+          element={
+            <ProtectedRoute>
+              <BecomeSeller />
+            </ProtectedRoute>
+          }
         />
+
+        <Route
+          path="/become-seller"
+          element={
+            <ProtectedRoute>
+              <BecomeSeller />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/pickup-locations" element={<PickupLocations />} />
       </Route>
 
       <Route
