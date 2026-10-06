@@ -4,8 +4,16 @@
   place-items: center;
   padding: 32px;
   background:
-    radial-gradient(circle at 15% 15%, rgba(47, 189, 104, 0.18), transparent 26%),
-    #0b1f17;
+    linear-gradient(
+      90deg,
+      rgba(7, 31, 22, 0.96) 0%,
+      rgba(7, 31, 22, 0.88) 42%,
+      rgba(7, 31, 22, 0.62) 68%,
+      rgba(7, 31, 22, 0.38) 100%
+    ),
+    url("https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=2200&q=86");
+  background-size: cover;
+  background-position: center;
 }
 
 .auth-shell {
@@ -31,6 +39,7 @@
 
 .auth-copy {
   color: white;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.18);
 }
 
 .auth-copy h1 {
@@ -98,6 +107,14 @@
 @media (max-width: 780px) {
   .auth-page {
     padding: 24px 18px;
+    background:
+      linear-gradient(
+        rgba(7, 31, 22, 0.82),
+        rgba(7, 31, 22, 0.82)
+      ),
+      url("https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=82");
+    background-size: cover;
+    background-position: center;
   }
 
   .auth-shell {
