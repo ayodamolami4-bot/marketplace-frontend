@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./features/auth/Login";
 import Signup from "./features/auth/Signup";
 
+import Home from "./features/customer/home/Home";
 import Products from "./features/customer/products/Products";
 import ProductDetails from "./features/customer/products/ProductDetails";
 import Cart from "./features/customer/cart/Cart";
@@ -24,7 +25,7 @@ function App() {
       <Route path="/signup" element={<Signup />} />
 
       <Route element={<MainLayout />}>
-        <Route path="/" element={<Products />} />
+        <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/:id" element={<ProductDetails />} />
 
