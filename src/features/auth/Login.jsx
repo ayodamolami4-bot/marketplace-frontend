@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { clearAuthError, loginUser } from "./authSlice";
 import "./auth.css";
@@ -8,12 +8,18 @@ function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { status, error, token, user } = useSelector((state) => state.auth);
 
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
+
+  const expired = useMemo(
+    () => searchParams.get("expired") === "1",
+    [searchParams]
+  );
 
   useEffect(() => {
     dispatch(clearAuthError());
@@ -29,12 +35,16 @@ function Login() {
       return;
     }
 
-    if (user.roles?.includes("ADMIN")) {
+    const roles = (user.roles || []).map((role) =>
+      String(role).trim().toLowerCase()
+    );
+
+    if (roles.includes("admin")) {
       navigate("/admin", { replace: true });
       return;
     }
 
-    if (user.roles?.includes("VENDOR")) {
+    if (roles.includes("vendor")) {
       navigate("/vendor", { replace: true });
       return;
     }
@@ -74,6 +84,12 @@ function Login() {
             <p className="eyebrow">ACCOUNT ACCESS</p>
             <h2>Login</h2>
           </div>
+
+          {expired && (
+            <div className="form-error">
+              Your session expired. Sign in again to continue.
+            </div>
+          )}
 
           {error && <div className="form-error">{error}</div>}
 
