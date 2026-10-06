@@ -24,6 +24,13 @@ import VendorProducts from "./features/vendor/VendorProducts";
 import VendorOrders from "./features/vendor/VendorOrders";
 import VendorFinance from "./features/vendor/VendorFinance";
 
+import AdminLayout from "./layouts/AdminLayout";
+import AdminDashboard from "./features/admin/AdminDashboard";
+import AdminUsers from "./features/admin/AdminUsers";
+import AdminVendors from "./features/admin/AdminVendors";
+import AdminCategories from "./features/admin/AdminCategories";
+import AdminReviews from "./features/admin/AdminReviews";
+
 function App() {
   return (
     <Routes>
@@ -116,6 +123,21 @@ function App() {
         <Route path="products" element={<VendorProducts />} />
         <Route path="orders" element={<VendorOrders />} />
         <Route path="finance" element={<VendorFinance />} />
+      </Route>
+
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute roles={["ADMIN"]}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="vendors" element={<AdminVendors />} />
+        <Route path="categories" element={<AdminCategories />} />
+        <Route path="reviews" element={<AdminReviews />} />
       </Route>
     </Routes>
   );
