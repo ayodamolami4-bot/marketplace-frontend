@@ -1,0 +1,145 @@
+.admin-app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  background: #f4f6f4;
+}
+
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 14px 16px;
+  background:
+    linear-gradient(rgba(8, 30, 22, 0.95), rgba(8, 30, 22, 0.98)),
+    url("https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=900&q=80");
+  background-size: cover;
+  background-position: center;
+  color: white;
+}
+
+.admin-brand {
+  padding: 0 10px 24px;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.admin-brand span {
+  color: #39cd79;
+}
+
+.admin-brand small {
+  display: block;
+  margin-top: 4px;
+  color: #a8bbb0;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-nav {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-nav a {
+  padding: 11px 12px;
+  border-radius: 7px;
+  color: #bfcbc4;
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.admin-nav a:hover,
+.admin-nav a.active {
+  background: rgba(72, 205, 126, 0.13);
+  color: white;
+}
+
+.admin-nav a.active {
+  box-shadow: inset 3px 0 #39cd79;
+}
+
+.admin-sidebar-user {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.admin-sidebar-user > div {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #2fbf6b;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.admin-sidebar-user > span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.admin-sidebar-user strong {
+  font-size: 0.69rem;
+}
+
+.admin-sidebar-user small {
+  overflow: hidden;
+  color: #9eafa5;
+  font-size: 0.55rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-main {
+  min-width: 0;
+  min-height: 100vh;
+  padding: 28px clamp(18px, 3vw, 42px) 50px;
+}
+
+@media (max-width: 780px) {
+  .admin-app {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    position: static;
+    height: auto;
+    padding: 15px 14px;
+  }
+
+  .admin-brand {
+    padding-bottom: 12px;
+  }
+
+  .admin-nav {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .admin-nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .admin-sidebar-user {
+    display: none;
+  }
+
+  .admin-main {
+    padding: 20px 14px 40px;
+  }
+}
