@@ -1,9 +1,17 @@
-import { NavLink, Outlet } from "react-router";
-import { useSelector } from "react-redux";
+import { NavLink, Outlet, useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../features/auth/authSlice";
 import "./AdminLayout.css";
 
 function AdminLayout() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+
+  function handleLogout() {
+    dispatch(logout());
+    navigate("/");
+  }
 
   return (
     <div className="admin-app">
@@ -17,21 +25,11 @@ function AdminLayout() {
           <NavLink to="/admin" end>
             Overview
           </NavLink>
-          <NavLink to="/admin/users">
-            Users
-          </NavLink>
-          <NavLink to="/admin/vendors">
-            Vendors
-          </NavLink>
-          <NavLink to="/admin/categories">
-            Categories
-          </NavLink>
-          <NavLink to="/admin/reviews">
-            Reviews
-          </NavLink>
-          <NavLink to="/">
-            Marketplace
-          </NavLink>
+          <NavLink to="/admin/users">Users</NavLink>
+          <NavLink to="/admin/vendors">Vendors</NavLink>
+          <NavLink to="/admin/categories">Categories</NavLink>
+          <NavLink to="/admin/reviews">Reviews</NavLink>
+          <NavLink to="/">Marketplace</NavLink>
         </nav>
 
         <div className="admin-sidebar-user">
@@ -41,6 +39,14 @@ function AdminLayout() {
             <small>{user?.email || ""}</small>
           </span>
         </div>
+
+        <button
+          type="button"
+          className="admin-sidebar-logout"
+          onClick={handleLogout}
+        >
+          Sign out
+        </button>
       </aside>
 
       <main className="admin-main">
