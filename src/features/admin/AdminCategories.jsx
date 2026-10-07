@@ -10,6 +10,7 @@ const initialForm = {
 
 function AdminCategories() {
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(initialForm);
   const [showForm, setShowForm] = useState(false);
   const [busyId, setBusyId] = useState("");
@@ -18,12 +19,15 @@ function AdminCategories() {
   const [error, setError] = useState("");
 
   async function loadCategories() {
+    setLoading(true);
     try {
       const response = await apiRequest("/categories");
       setCategories(response?.data || []);
       setError("");
     } catch (requestError) {
       setError(requestError.message || "Could not load categories.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -38,6 +42,7 @@ function AdminCategories() {
 
   async function createCategory(event) {
     event.preventDefault();
+    if (!form.name.trim()) { setError("Enter a category name."); return; }
 
     try {
       setSaving(true);
@@ -45,7 +50,7 @@ function AdminCategories() {
       await apiRequest("/categories", {
         method: "POST",
         body: JSON.stringify({
-          name: form.name,
+          name: form.name.trim(),
           description: form.description,
           active: true,
           parentId: null,
@@ -102,7 +107,7 @@ function AdminCategories() {
         </button>
       </div>
 
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
       {message && <div className="admin-success">{message}</div>}
 
       {showForm && (
@@ -168,7 +173,8 @@ function AdminCategories() {
                 </tr>
               ))}
 
-              {!categories.length && (
+              {loading && <tr><td colSpan="5" role="status">Loading categories…</td></tr>}
+              {!loading && !error && !categories.length && (
                 <tr>
                   <td colSpan="5" className="admin-empty-cell">
                     No categories found.

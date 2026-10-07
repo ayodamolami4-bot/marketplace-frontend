@@ -4,23 +4,27 @@ import "./admin.css";
 
 function AdminReviews() {
   const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
   const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
 
-  async function loadReviews(nextFilter = filter) {
-    try {
-      const query = nextFilter ? `?status=${encodeURIComponent(nextFilter)}` : "";
-      const response = await apiRequest(`/admin/reviews${query}`);
-      setReviews(response?.data || []);
-      setError("");
-    } catch (requestError) {
-      setError(requestError.message || "Could not load reviews.");
-    }
-  }
-
   useEffect(() => {
-    loadReviews(filter);
+    let active = true;
+    async function loadReviews() {
+      setLoading(true);
+      try {
+        const query = filter ? `?status=${encodeURIComponent(filter)}` : "";
+        const response = await apiRequest(`/admin/reviews${query}`);
+        if (active) { setReviews(response?.data || []); setError(""); }
+      } catch (requestError) {
+        if (active) setError(requestError.message || "Could not load reviews.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    loadReviews();
+    return () => { active = false; };
   }, [filter]);
 
   async function moderate(reviewId, action) {
@@ -34,6 +38,7 @@ function AdminReviews() {
 
       setReviews((current) =>
         current.map((review) => (review.id === reviewId ? updated : review))
+          .filter((review) => !filter || review.status === filter)
       );
       setError("");
     } catch (requestError) {
@@ -53,7 +58,7 @@ function AdminReviews() {
         </div>
 
         <select
-          className="admin-filter"
+          className="admin-filter" aria-label="Review status" disabled={Boolean(busyId)}
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
         >
@@ -64,10 +69,11 @@ function AdminReviews() {
         </select>
       </div>
 
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
 
       <section className="admin-review-grid">
-        {reviews.map((review) => (
+        {loading && <p role="status">Loading reviews…</p>}
+        {!loading && reviews.map((review) => (
           <article className="admin-review-card" key={review.id}>
             <div className="admin-review-top">
               <div>
@@ -109,7 +115,7 @@ function AdminReviews() {
           </article>
         ))}
 
-        {!reviews.length && (
+        {!loading && !error && !reviews.length && (
           <div className="admin-mini-empty">No reviews match this filter.</div>
         )}
       </section>
