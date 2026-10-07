@@ -23,30 +23,52 @@ function VendorDashboard() {
     let active = true;
 
     async function loadDashboard() {
-      try {
-        setLoading(true);
+      setLoading(true);
 
-        const [dashboardData, ordersData, reportData, inventoryData] =
-          await Promise.all([
-            apiRequest("/vendor/dashboard"),
-            apiRequest("/vendor/orders"),
-            apiRequest("/vendor/reports"),
-            apiRequest("/vendor/inventory"),
-          ]);
+      const results = await Promise.allSettled([
+        apiRequest("/vendor/dashboard"),
+        apiRequest("/vendor/orders"),
+        apiRequest("/vendor/reports"),
+        apiRequest("/vendor/inventory"),
+      ]);
 
-        if (!active) return;
+      if (!active) return;
 
-        setDashboard(dashboardData);
-        setOrders(ordersData?.data || []);
-        setReport(reportData);
-        setInventory(inventoryData?.data || []);
-        setError("");
-      } catch (requestError) {
-        if (!active) return;
-        setError(requestError.message || "Could not load seller dashboard.");
-      } finally {
-        if (active) setLoading(false);
+      const [
+        dashboardResult,
+        ordersResult,
+        reportResult,
+        inventoryResult,
+      ] = results;
+
+      if (dashboardResult.status === "fulfilled") {
+        setDashboard(dashboardResult.value);
       }
+
+      if (ordersResult.status === "fulfilled") {
+        setOrders(ordersResult.value?.data || []);
+      }
+
+      if (reportResult.status === "fulfilled") {
+        setReport(reportResult.value);
+      }
+
+      if (inventoryResult.status === "fulfilled") {
+        setInventory(inventoryResult.value?.data || []);
+      }
+
+      const failure = results.find(
+        (result) => result.status === "rejected"
+      );
+
+      setError(
+        failure
+          ? failure.reason?.message ||
+              "Some seller dashboard data could not be loaded."
+          : ""
+      );
+
+      setLoading(false);
     }
 
     loadDashboard();
@@ -132,10 +154,12 @@ function VendorDashboard() {
                     title={money(point.revenue)}
                   />
                 </div>
-                <small>{new Date(point.date).toLocaleDateString("en-NG", {
-                  month: "short",
-                  day: "numeric",
-                })}</small>
+                <small>
+                  {new Date(point.date).toLocaleDateString("en-NG", {
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </small>
               </div>
             ))}
 
@@ -206,7 +230,9 @@ function VendorDashboard() {
                     <td>{order.items.length}</td>
                     <td>{money(total)}</td>
                     <td>
-                      <span className={`vendor-status vendor-status-${order.status}`}>
+                      <span
+                        className={`vendor-status vendor-status-${order.status}`}
+                      >
                         {order.status.replaceAll("_", " ")}
                       </span>
                     </td>
