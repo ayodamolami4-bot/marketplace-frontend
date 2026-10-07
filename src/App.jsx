@@ -12,6 +12,7 @@ import ProductDetails from "./features/customer/products/ProductDetails";
 import Cart from "./features/customer/cart/Cart";
 import Wishlist from "./features/customer/wishlist/Wishlist";
 import Payment from "./features/customer/payments/Payment";
+import DemoPayment from "./features/customer/payments/DemoPayment";
 import Orders from "./features/customer/orders/Orders";
 import Reviews from "./features/customer/reviews/Reviews";
 import Notifications from "./features/customer/notifications/Notifications";
@@ -66,6 +67,24 @@ function App() {
           element={
             <ProtectedRoute>
               <Payment />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payment/demo"
+          element={
+            <ProtectedRoute>
+              <DemoPayment />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payment/callback"
+          element={
+            <ProtectedRoute>
+              <DemoPayment />
             </ProtectedRoute>
           }
         />
