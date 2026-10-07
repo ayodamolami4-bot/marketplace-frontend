@@ -1,12 +1,44 @@
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../features/auth/authSlice";
+import { apiRequest } from "../services/api";
 import "./VendorLayout.css";
 
 function VendorLayout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+
+  const [businessName, setBusinessName] = useState("");
+  const [businessError, setBusinessError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadVendorIdentity() {
+      try {
+        const dashboard = await apiRequest("/vendor/dashboard");
+
+        if (!active) return;
+
+        setBusinessName(dashboard?.businessName || "");
+        setBusinessError("");
+      } catch (requestError) {
+        if (!active) return;
+
+        setBusinessError(
+          requestError.message || "Could not load seller identity."
+        );
+      }
+    }
+
+    loadVendorIdentity();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function handleLogout() {
     dispatch(logout());
@@ -19,6 +51,12 @@ function VendorLayout() {
         <div className="vendor-brand">
           MARKET<span>PLACE</span>
           <small>Seller Center</small>
+        </div>
+
+        <div className="vendor-store-identity">
+          <span>STORE</span>
+          <strong>{businessName || "Your Store"}</strong>
+          {businessError && <small>{businessError}</small>}
         </div>
 
         <nav className="vendor-nav">
