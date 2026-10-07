@@ -524,3 +524,84 @@
     grid-template-columns: 85px minmax(60px, 1fr) auto;
   }
 }
+
+
+.admin-notification-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-notification-actions button,
+.admin-notification-card > button {
+  border: 1px solid #d8e0da;
+  border-radius: 6px;
+  background: white;
+  color: #425148;
+  padding: 8px 10px;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.admin-notification-actions button.active {
+  border-color: #20a65a;
+  color: #168a49;
+}
+
+.admin-notification-list {
+  display: grid;
+}
+
+.admin-notification-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #edf0ee;
+}
+
+.admin-notification-card:last-child {
+  border-bottom: 0;
+}
+
+.admin-notification-card.unread {
+  background: #f5fbf7;
+}
+
+.admin-notification-card > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-notification-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-notification-top h2 {
+  font-size: 0.76rem;
+}
+
+.admin-notification-top time {
+  flex: 0 0 auto;
+  color: #87928b;
+  font-size: 0.56rem;
+}
+
+.admin-notification-card p {
+  margin-top: 5px;
+  color: #667269;
+  font-size: 0.66rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 620px) {
+  .admin-notification-card,
+  .admin-notification-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
