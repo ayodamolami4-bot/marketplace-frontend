@@ -20,25 +20,38 @@ function VendorFinance() {
     let active = true;
 
     async function loadFinance() {
-      try {
-        setLoading(true);
+      setLoading(true);
 
-        const [financeData, reportData] = await Promise.all([
-          apiRequest("/vendor/finance"),
-          apiRequest("/vendor/reports"),
-        ]);
+      const [financeResult, reportResult] = await Promise.allSettled([
+        apiRequest("/vendor/finance"),
+        apiRequest("/vendor/reports"),
+      ]);
 
-        if (!active) return;
+      if (!active) return;
 
-        setFinance(financeData);
-        setReport(reportData);
-        setError("");
-      } catch (requestError) {
-        if (!active) return;
-        setError(requestError.message || "Could not load finance data.");
-      } finally {
-        if (active) setLoading(false);
+      if (financeResult.status === "fulfilled") {
+        setFinance(financeResult.value);
       }
+
+      if (reportResult.status === "fulfilled") {
+        setReport(reportResult.value);
+      }
+
+      const failure =
+        financeResult.status === "rejected"
+          ? financeResult
+          : reportResult.status === "rejected"
+            ? reportResult
+            : null;
+
+      setError(
+        failure
+          ? failure.reason?.message ||
+              "Some finance data could not be loaded."
+          : ""
+      );
+
+      setLoading(false);
     }
 
     loadFinance();
@@ -131,6 +144,12 @@ function VendorFinance() {
                 </small>
               </div>
             ))}
+
+            {!report?.revenueOverTime?.length && (
+              <div className="vendor-chart-empty">
+                No revenue data yet
+              </div>
+            )}
           </div>
         </section>
 
@@ -155,7 +174,9 @@ function VendorFinance() {
             ))}
 
             {!report?.bestSellers?.length && (
-              <div className="vendor-mini-empty">No sales data yet.</div>
+              <div className="vendor-mini-empty">
+                No sales data yet.
+              </div>
             )}
           </div>
         </section>
@@ -167,10 +188,9 @@ function VendorFinance() {
             <h2>Payout History</h2>
             <p>
               Schedule:{" "}
-              {String(finance?.payoutSchedule || "not configured").replaceAll(
-                "_",
-                " "
-              )}
+              {String(
+                finance?.payoutSchedule || "not configured"
+              ).replaceAll("_", " ")}
             </p>
           </div>
           <strong className="paid-total">
@@ -191,7 +211,7 @@ function VendorFinance() {
             <tbody>
               {(finance?.payouts || []).map((payout) => (
                 <tr key={payout.id}>
-                  <td>{payout.reference || "—"}</td>
+                  <td>{payout.reference || "-"}</td>
                   <td>{money(payout.amount)}</td>
                   <td>
                     <span className="vendor-status">
