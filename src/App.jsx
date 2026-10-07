@@ -13,6 +13,7 @@ import Cart from "./features/customer/cart/Cart";
 import Wishlist from "./features/customer/wishlist/Wishlist";
 import Payment from "./features/customer/payments/Payment";
 import DemoPayment from "./features/customer/payments/DemoPayment";
+import PaymentCallback from "./features/customer/payments/PaymentCallback";
 import Orders from "./features/customer/orders/Orders";
 import Reviews from "./features/customer/reviews/Reviews";
 import Notifications from "./features/customer/notifications/Notifications";
@@ -84,7 +85,7 @@ function App() {
           path="/payment/callback"
           element={
             <ProtectedRoute>
-              <DemoPayment />
+              <PaymentCallback />
             </ProtectedRoute>
           }
         />
