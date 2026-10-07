@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { apiRequest } from "../../../services/api";
+import { productImage } from "../../../utils/productImage";
 import "./cart.css";
 
 function money(value = 0) {
@@ -39,6 +40,7 @@ function Cart() {
       setCart(response || { items: [], subtotal: 0 });
       setProducts(Object.fromEntries(details));
       setError("");
+      window.dispatchEvent(new Event("marketplace:cart-updated"));
     } catch (requestError) {
       setError(requestError.message || "Could not load your cart.");
     } finally {
@@ -61,6 +63,7 @@ function Cart() {
       });
 
       setCart(response);
+      window.dispatchEvent(new Event("marketplace:cart-updated"));
     } catch (requestError) {
       setError(requestError.message || "Could not update quantity.");
     } finally {
@@ -75,6 +78,7 @@ function Cart() {
         method: "DELETE",
       });
       await loadCart();
+      window.dispatchEvent(new Event("marketplace:cart-updated"));
     } catch (requestError) {
       setError(requestError.message || "Could not remove item.");
     } finally {
@@ -130,7 +134,7 @@ function Cart() {
 
       {!cart.items?.length ? (
         <div className="empty-cart">
-          <div className="empty-cart-icon">🛒</div>
+          <div className="empty-cart-icon">Cart</div>
           <h2>Your cart is empty</h2>
           <p>Add products from the marketplace before checking out.</p>
           <Link to="/products" className="primary-button">
@@ -141,7 +145,9 @@ function Cart() {
         <div className="cart-layout">
           <section className="cart-items-panel">
             <div className="cart-panel-title">
-              <strong>{cart.items.length} item{cart.items.length === 1 ? "" : "s"}</strong>
+              <strong>
+                {cart.items.length} item{cart.items.length === 1 ? "" : "s"}
+              </strong>
               <span>Seller items may ship separately</span>
             </div>
 
@@ -155,10 +161,13 @@ function Cart() {
                       to={`/products/${item.productId}`}
                       className="cart-product-image"
                     >
-                      {product?.images?.[0] ? (
-                        <img src={product.images[0]} alt={product.name} />
+                      {product ? (
+                        <img
+                          src={productImage(product)}
+                          alt={product.name}
+                        />
                       ) : (
-                        <div>No image</div>
+                        <div>Product</div>
                       )}
                     </Link>
 
@@ -173,26 +182,37 @@ function Cart() {
                           {product?.vendor?.name || "Marketplace vendor"}
                         </strong>
                       </p>
-                      <strong className="cart-price">{money(item.price)}</strong>
+                      <strong className="cart-price">
+                        {money(item.price)}
+                      </strong>
                     </div>
 
                     <div className="cart-row-actions">
                       <div className="cart-quantity">
                         <button
                           type="button"
-                          disabled={updatingId === item.productId || item.quantity <= 1}
+                          disabled={
+                            updatingId === item.productId ||
+                            item.quantity <= 1
+                          }
                           onClick={() =>
-                            changeQuantity(item.productId, item.quantity - 1)
+                            changeQuantity(
+                              item.productId,
+                              item.quantity - 1
+                            )
                           }
                         >
-                          −
+                          -
                         </button>
                         <span>{item.quantity}</span>
                         <button
                           type="button"
                           disabled={updatingId === item.productId}
                           onClick={() =>
-                            changeQuantity(item.productId, item.quantity + 1)
+                            changeQuantity(
+                              item.productId,
+                              item.quantity + 1
+                            )
                           }
                         >
                           +
@@ -233,7 +253,7 @@ function Cart() {
 
             <div className="summary-line-item">
               <span>Discount</span>
-              <strong>—</strong>
+              <strong>-</strong>
             </div>
 
             <div className="summary-divider" />
