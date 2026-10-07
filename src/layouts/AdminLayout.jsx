@@ -29,6 +29,7 @@ function AdminLayout() {
           <NavLink to="/admin/vendors">Vendors</NavLink>
           <NavLink to="/admin/categories">Categories</NavLink>
           <NavLink to="/admin/reviews">Reviews</NavLink>
+          <NavLink to="/admin/notifications">Notifications</NavLink>
           <NavLink to="/">Marketplace</NavLink>
         </nav>
 
