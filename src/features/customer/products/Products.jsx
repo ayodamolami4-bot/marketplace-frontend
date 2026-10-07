@@ -22,6 +22,7 @@ function Products() {
   const [busyId, setBusyId] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
 
   const q = searchParams.get("q") || "";
   const category = searchParams.get("category") || "";
@@ -32,6 +33,7 @@ function Products() {
 
     async function loadProducts() {
       setLoading(true);
+      setError("");
 
       const params = new URLSearchParams({
         page: "1",
@@ -71,7 +73,7 @@ function Products() {
     return () => {
       active = false;
     };
-  }, [q, category, sort]);
+  }, [q, category, sort, retryCount]);
 
   useEffect(() => {
     let active = true;
@@ -221,7 +223,14 @@ function Products() {
         </aside>
 
         <section className="catalog-results">
-          {error && <div className="form-error">{error}</div>}
+          {error && (
+            <div className="form-error" role="alert">
+              <p>{error}</p>
+              <button type="button" onClick={() => setRetryCount((count) => count + 1)}>
+                Try again
+              </button>
+            </div>
+          )}
 
           {loading ? (
             <div className="catalog-grid">
@@ -291,11 +300,11 @@ function Products() {
                 );
               })}
             </div>
-          ) : (
+          ) : !error ? (
             <div className="empty-state">
               No products match this search yet.
             </div>
-          )}
+          ) : null}
         </section>
       </div>
     </div>
