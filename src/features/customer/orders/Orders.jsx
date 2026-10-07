@@ -22,6 +22,12 @@ function Orders() {
   const [searchParams] = useSearchParams();
   const { user } = useSelector((state) => state.auth);
 
+  const userRoles = (user?.roles || []).map((role) =>
+    String(role).trim().toLowerCase()
+  );
+  const isVendor = userRoles.includes("vendor");
+  const isAdmin = userRoles.includes("admin");
+
   const [orders, setOrders] = useState([]);
   const [selectedOrderId, setSelectedOrderId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -142,7 +148,10 @@ function Orders() {
           <Link to="/wishlist">Wishlist</Link>
           <Link to="/notifications">Notifications</Link>
           <Link to="/reviews">Reviews</Link>
-          <Link to="/sell">Become a Seller</Link>
+          {!isVendor && !isAdmin && (
+            <Link to="/sell">Become a Seller</Link>
+          )}
+          {isVendor && <Link to="/vendor">Seller Center</Link>}
           <Link to="/cart">Cart</Link>
           <Link to="/products">Continue Shopping</Link>
         </nav>
