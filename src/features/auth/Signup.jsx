@@ -14,6 +14,7 @@ function Signup() {
     email: "",
     password: "",
   });
+  const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
     dispatch(clearAuthError());
@@ -34,6 +35,11 @@ function Signup() {
 
   function handleSubmit(event) {
     event.preventDefault();
+    if (!/^(?=.*\p{L})[\p{L}\p{M} .'-]+$/u.test(form.name.trim()) || form.name.trim().length > 150) {
+      setValidationError('Enter a name using letters, spaces or name punctuation (up to 150 characters).'); return;
+    }
+    if (new TextEncoder().encode(form.password).length > 72) { setValidationError('Password must be at most 72 UTF-8 bytes.'); return; }
+    setValidationError('');
     dispatch(signupUser(form));
   }
 
@@ -60,11 +66,13 @@ function Signup() {
           </div>
 
           {error && <div className="form-error">{error}</div>}
+          {validationError && <div className="form-error" role="alert">{validationError}</div>}
 
           <label>
             Full name
             <input
               name="name"
+              maxLength={150}
               value={form.name}
               onChange={updateField}
               placeholder="Your full name"
@@ -77,6 +85,7 @@ function Signup() {
             <input
               name="email"
               type="email"
+              maxLength={320}
               value={form.email}
               onChange={updateField}
               placeholder="you@example.com"

@@ -37,6 +37,9 @@ function BecomeSeller() {
 
   async function submitApplication(event) {
     event.preventDefault();
+    if (!/\p{L}/u.test(form.businessName) || form.businessName.trim().length > 150 || form.businessDescription.length > 1000) {
+      setError('Business name must contain letters and be at most 150 characters; description must be at most 1000 characters.'); return;
+    }
 
     try {
       setSubmitting(true);

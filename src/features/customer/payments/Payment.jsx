@@ -113,6 +113,7 @@ function Payment() {
   }
 
   async function placeOrder() {
+    if (submitting || applyingCoupon) return;
     if (!selectedAddressId) {
       setError("Choose or add a delivery address.");
       return;
@@ -238,7 +239,7 @@ function Payment() {
         <h1>Delivery & Payment</h1>
       </div>
 
-      {error && <div className="form-error payment-error">{error}</div>}
+      {error && <div className="form-error payment-error" role="alert">{error}</div>}
 
       <div className="payment-layout">
         <div className="payment-main">
@@ -487,7 +488,7 @@ function Payment() {
         </div>
 
         <aside className="payment-summary-card">
-          <label>Coupon code<input value={couponCode} maxLength={50} onChange={event => { setCouponCode(event.target.value); setCouponQuote(null); }} placeholder="Enter seller coupon" /></label>
+          <label>Coupon code<input value={couponCode} disabled={applyingCoupon || submitting} maxLength={50} onChange={event => { setCouponCode(event.target.value); setCouponQuote(null); }} placeholder="Enter seller coupon" /></label>
           <button type="button" onClick={applyCoupon} disabled={applyingCoupon || !couponCode.trim()}>{applyingCoupon ? 'Checking…' : 'Apply Coupon'}</button>
           {couponQuote && <p role="status">Coupon applied to eligible seller items. Discount: {money(couponQuote.discountAmount)}</p>}
           <div className="payment-summary-head">
@@ -527,7 +528,7 @@ function Payment() {
             type="button"
             className="place-order-button"
             onClick={placeOrder}
-            disabled={submitting || !cart.items.length}
+            disabled={submitting || applyingCoupon || !cart.items.length}
           >
             {submitting ? "Processing..." : "Place Order →"}
           </button>

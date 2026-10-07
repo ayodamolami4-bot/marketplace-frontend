@@ -74,6 +74,15 @@ function VendorProducts() {
 
   async function createProduct(event) {
     event.preventDefault();
+    if (!form.name.trim() || form.name.trim().length > 200 || form.description.length > 2000 || !form.categoryId) {
+      setError('Enter a product name (up to 200 characters), choose a category, and keep the description within 2000 characters.'); return;
+    }
+    if (form.price === '' || !Number.isFinite(Number(form.price)) || Number(form.price) < 0 || form.stock === '' || !Number.isInteger(Number(form.stock)) || Number(form.stock) < 0) {
+      setError('Enter a non-negative price and a whole-number stock quantity.'); return;
+    }
+    if (imageFile && (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(imageFile.type) || imageFile.size > 10 * 1024 * 1024)) {
+      setError('Choose a JPEG, PNG, WebP or GIF image of at most 10 MB.'); return;
+    }
 
     try {
       setSaving(true);
@@ -110,6 +119,7 @@ function VendorProducts() {
     const value = editingStock[item.id];
 
     if (value === undefined || value === "") return;
+    if (!Number.isInteger(Number(value)) || Number(value) < 0) { setError('Stock must be a non-negative whole number.'); return; }
 
     try {
       setSaving(true);
