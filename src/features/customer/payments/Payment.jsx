@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { apiRequest } from "../../../services/api";
 import "./payment.css";
+import { countries, validateAddress } from '../../../utils/addressValidation';
 
 function money(value = 0) {
   return new Intl.NumberFormat("en-NG", {
@@ -32,6 +33,9 @@ function Payment() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState("delivery");
   const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [couponCode, setCouponCode] = useState('');
+  const [couponQuote, setCouponQuote] = useState(null);
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -86,6 +90,8 @@ function Payment() {
   }
 
   async function saveAddress() {
+    const validationError = validateAddress(addressForm);
+    if (validationError) { setError(validationError); return; }
     try {
       setSubmitting(true);
 
@@ -121,21 +127,25 @@ function Payment() {
       setSubmitting(true);
       setError("");
 
-      const idempotencyKey =
-        crypto.randomUUID?.() ||
-        `checkout-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      const checkoutBody = { addressId: selectedAddressId, deliveryMethod, paymentMethod, couponCode: couponQuote ? couponCode.trim().toUpperCase() : '' };
+      const accountId = JSON.parse(localStorage.getItem('marketplace_user') || '{}').id;
+      const fingerprint = JSON.stringify({ accountId, ...checkoutBody, items: cart.items.map(item => [item.productId, item.quantity]) });
+      let attempt;
+      try { attempt = JSON.parse(sessionStorage.getItem('marketplace_checkout_attempt') || 'null'); } catch { attempt = null; }
+      if (!attempt || attempt.fingerprint !== fingerprint) {
+        attempt = { fingerprint, key: crypto.randomUUID?.() || `checkout-${Date.now()}-${Math.random().toString(16).slice(2)}` };
+        sessionStorage.setItem('marketplace_checkout_attempt', JSON.stringify(attempt));
+      }
+      const idempotencyKey = attempt.key;
 
       const response = await apiRequest("/checkout", {
         method: "POST",
         headers: {
           "Idempotency-Key": idempotencyKey,
         },
-        body: JSON.stringify({
-          addressId: selectedAddressId,
-          deliveryMethod,
-          paymentMethod,
-        }),
+        body: JSON.stringify(checkoutBody),
       });
+      sessionStorage.removeItem('marketplace_checkout_attempt');
 
       localStorage.setItem("marketplace_last_order_id", response.orderId);
 
@@ -178,6 +188,13 @@ function Payment() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function applyCoupon() {
+    setApplyingCoupon(true); setError(''); setCouponQuote(null);
+    try { setCouponQuote(await apiRequest('/coupons/preview', { method: 'POST', body: JSON.stringify({ code: couponCode.trim().toUpperCase() }) })); }
+    catch (failure) { setError(failure.message); }
+    finally { setApplyingCoupon(false); }
   }
 
   if (loading) {
@@ -331,11 +348,11 @@ function Payment() {
                 <div className="form-grid-two">
                   <label>
                     Country
-                    <input
+                    <select
                       name="country"
                       value={addressForm.country}
                       onChange={updateAddress}
-                    />
+                    >{countries.map(country => <option key={country} value={country}>{country}</option>)}</select>
                   </label>
 
                   <label>
@@ -470,6 +487,9 @@ function Payment() {
         </div>
 
         <aside className="payment-summary-card">
+          <label>Coupon code<input value={couponCode} maxLength={50} onChange={event => { setCouponCode(event.target.value); setCouponQuote(null); }} placeholder="Enter seller coupon" /></label>
+          <button type="button" onClick={applyCoupon} disabled={applyingCoupon || !couponCode.trim()}>{applyingCoupon ? 'Checking…' : 'Apply Coupon'}</button>
+          {couponQuote && <p role="status">Coupon applied to eligible seller items. Discount: {money(couponQuote.discountAmount)}</p>}
           <div className="payment-summary-head">
             <h2>Order Summary</h2>
             <span>{itemCount} item{itemCount === 1 ? "" : "s"}</span>
@@ -500,7 +520,7 @@ function Payment() {
 
           <div className="summary-total-row">
             <span>Total</span>
-            <strong>{money(cart.subtotal)}</strong>
+            <strong>{money(couponQuote?.totalAmount ?? cart.subtotal)}</strong>
           </div>
 
           <button

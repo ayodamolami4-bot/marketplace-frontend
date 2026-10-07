@@ -65,6 +65,7 @@ function VendorLayout() {
           </NavLink>
           <NavLink to="/vendor/products">Products</NavLink>
           <NavLink to="/vendor/orders">Orders</NavLink>
+          <NavLink to="/vendor/coupons">Coupons</NavLink>
           <NavLink to="/vendor/finance">Finance & Reports</NavLink>
           <NavLink to="/">View Storefront</NavLink>
         </nav>

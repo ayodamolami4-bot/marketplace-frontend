@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router";
+import VendorCoupons from './features/vendor/VendorCoupons';
 
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -159,6 +160,7 @@ function App() {
         <Route index element={<VendorDashboard />} />
         <Route path="products" element={<VendorProducts />} />
         <Route path="orders" element={<VendorOrders />} />
+        <Route path="coupons" element={<VendorCoupons />} />
         <Route path="finance" element={<VendorFinance />} />
       </Route>
 
