@@ -24,32 +24,56 @@ function AdminDashboard() {
     let active = true;
 
     async function loadDashboard() {
-      try {
-        setLoading(true);
+      setLoading(true);
 
-        const [reportData, usersData, vendorsData, reviewsData, categoriesData] =
-          await Promise.all([
-            apiRequest("/admin/reports"),
-            apiRequest("/admin/users"),
-            apiRequest("/admin/vendors/pending"),
-            apiRequest("/admin/reviews"),
-            apiRequest("/categories"),
-          ]);
+      const results = await Promise.allSettled([
+        apiRequest("/admin/reports"),
+        apiRequest("/admin/users"),
+        apiRequest("/admin/vendors/pending"),
+        apiRequest("/admin/reviews"),
+        apiRequest("/categories"),
+      ]);
 
-        if (!active) return;
+      if (!active) return;
 
-        setReport(reportData);
-        setUsers(usersData?.data || []);
-        setVendors(vendorsData || []);
-        setReviews(reviewsData?.data || []);
-        setCategories(categoriesData?.data || []);
-        setError("");
-      } catch (requestError) {
-        if (!active) return;
-        setError(requestError.message || "Could not load admin dashboard.");
-      } finally {
-        if (active) setLoading(false);
+      const [
+        reportResult,
+        usersResult,
+        vendorsResult,
+        reviewsResult,
+        categoriesResult,
+      ] = results;
+
+      if (reportResult.status === "fulfilled") {
+        setReport(reportResult.value);
       }
+
+      if (usersResult.status === "fulfilled") {
+        setUsers(usersResult.value?.data || []);
+      }
+
+      if (vendorsResult.status === "fulfilled") {
+        setVendors(vendorsResult.value || []);
+      }
+
+      if (reviewsResult.status === "fulfilled") {
+        setReviews(reviewsResult.value?.data || []);
+      }
+
+      if (categoriesResult.status === "fulfilled") {
+        setCategories(categoriesResult.value?.data || []);
+      }
+
+      const failure = results.find((result) => result.status === "rejected");
+
+      setError(
+        failure
+          ? failure.reason?.message ||
+              "Some admin dashboard data could not be loaded."
+          : ""
+      );
+
+      setLoading(false);
     }
 
     loadDashboard();
@@ -78,7 +102,10 @@ function AdminDashboard() {
         <div>
           <p className="eyebrow">ADMIN CONSOLE</p>
           <h1>Marketplace Overview</h1>
-          <p>Monitor platform activity, sellers, users and marketplace performance.</p>
+          <p>
+            Monitor platform activity, sellers, users and marketplace
+            performance.
+          </p>
         </div>
       </div>
 
@@ -94,7 +121,7 @@ function AdminDashboard() {
         <article>
           <small>Total Orders</small>
           <strong>{report?.totalOrders || 0}</strong>
-          <span>Orders across all sellers</span>
+          <span>Paid seller orders</span>
         </article>
 
         <article>
@@ -225,7 +252,7 @@ function AdminDashboard() {
               <div key={review.id}>
                 <span>
                   <strong>{review.productName}</strong>
-                  <small>{review.userName} · {review.rating}/5</small>
+                  <small>{review.userName} - {review.rating}/5</small>
                 </span>
                 <b>{String(review.status).replaceAll("_", " ")}</b>
               </div>
@@ -250,7 +277,7 @@ function AdminDashboard() {
           <div><strong>{users.length}</strong><span>Accounts</span></div>
           <div><strong>{categories.length}</strong><span>Active Categories</span></div>
           <div><strong>{reviews.length}</strong><span>Reviews</span></div>
-          <div><strong>{vendors.length}</strong><span>Vendor Applications</span></div>
+          <div><strong>{vendors.length}</strong><span>Pending Vendors</span></div>
         </div>
       </section>
     </div>
