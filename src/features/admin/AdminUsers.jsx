@@ -25,21 +25,35 @@ function AdminUsers() {
     loadUsers();
   }, []);
 
-  async function suspendUser(userId) {
+  async function updateUserStatus(user) {
+    const isSuspended =
+      String(user.status).toLowerCase() === "suspended";
+
+    const endpoint = isSuspended
+      ? `/admin/users/${user.id}/activate`
+      : `/admin/users/${user.id}/suspend`;
+
     try {
-      setBusyId(userId);
+      setBusyId(user.id);
 
-      const updated = await apiRequest(
-        `/admin/users/${userId}/suspend`,
-        { method: "PATCH" }
+      const updated = await apiRequest(endpoint, {
+        method: "PATCH",
+      });
+
+      setUsers((currentUsers) =>
+        currentUsers.map((currentUser) =>
+          currentUser.id === user.id ? updated : currentUser
+        )
       );
 
-      setUsers((current) =>
-        current.map((user) => (user.id === userId ? updated : user))
-      );
       setError("");
     } catch (requestError) {
-      setError(requestError.message || "Could not suspend user.");
+      setError(
+        requestError.message ||
+          (isSuspended
+            ? "Could not reactivate user."
+            : "Could not suspend user.")
+      );
     } finally {
       setBusyId("");
     }
@@ -74,35 +88,49 @@ function AdminUsers() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
-                  <tr key={user.id}>
-                    <td>
-                      <strong>{user.name}</strong>
-                      <small className="admin-table-sub">{user.email}</small>
-                    </td>
-                    <td>{user.roles?.join(", ") || "customer"}</td>
-                    <td>
-                      <span className={`admin-status status-${String(user.status).toLowerCase()}`}>
-                        {user.status}
-                      </span>
-                    </td>
-                    <td>{user.emailVerified ? "Yes" : "No"}</td>
-                    <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                    <td>
-                      <button
-                        type="button"
-                        className="admin-danger-link"
-                        disabled={
-                          busyId === user.id ||
-                          String(user.status).toLowerCase() === "suspended"
-                        }
-                        onClick={() => suspendUser(user.id)}
-                      >
-                        {busyId === user.id ? "Updating..." : "Suspend"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {users.map((user) => {
+                  const isSuspended =
+                    String(user.status).toLowerCase() === "suspended";
+
+                  return (
+                    <tr key={user.id}>
+                      <td>
+                        <strong>{user.name}</strong>
+                        <small className="admin-table-sub">{user.email}</small>
+                      </td>
+                      <td>{user.roles?.join(", ") || "customer"}</td>
+                      <td>
+                        <span
+                          className={`admin-status status-${String(
+                            user.status
+                          ).toLowerCase()}`}
+                        >
+                          {user.status}
+                        </span>
+                      </td>
+                      <td>{user.emailVerified ? "Yes" : "No"}</td>
+                      <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className={
+                            isSuspended
+                              ? "admin-approve-button"
+                              : "admin-danger-link"
+                          }
+                          disabled={busyId === user.id}
+                          onClick={() => updateUserStatus(user)}
+                        >
+                          {busyId === user.id
+                            ? "Updating..."
+                            : isSuspended
+                              ? "Unsuspend"
+                              : "Suspend"}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
 
                 {!users.length && (
                   <tr>
