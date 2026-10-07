@@ -52,7 +52,8 @@ export async function apiRequest(path, options = {}) {
   } catch (error) {
     if (timeoutSignal.aborted && !options.signal?.aborted) {
       throw new Error(
-        "The server is taking longer than expected. It may be waking up. Please try again shortly."
+        "The server is taking longer than expected. It may be waking up. Please try again shortly.",
+        { cause: error }
       );
     }
     throw error;
