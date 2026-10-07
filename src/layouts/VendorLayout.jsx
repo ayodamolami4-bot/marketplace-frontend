@@ -1,9 +1,17 @@
-import { NavLink, Outlet } from "react-router";
-import { useSelector } from "react-redux";
+import { NavLink, Outlet, useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../features/auth/authSlice";
 import "./VendorLayout.css";
 
 function VendorLayout() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+
+  function handleLogout() {
+    dispatch(logout());
+    navigate("/");
+  }
 
   return (
     <div className="vendor-app">
@@ -17,18 +25,10 @@ function VendorLayout() {
           <NavLink to="/vendor" end>
             Dashboard
           </NavLink>
-          <NavLink to="/vendor/products">
-            Products
-          </NavLink>
-          <NavLink to="/vendor/orders">
-            Orders
-          </NavLink>
-          <NavLink to="/vendor/finance">
-            Finance & Reports
-          </NavLink>
-          <NavLink to="/">
-            View Storefront
-          </NavLink>
+          <NavLink to="/vendor/products">Products</NavLink>
+          <NavLink to="/vendor/orders">Orders</NavLink>
+          <NavLink to="/vendor/finance">Finance & Reports</NavLink>
+          <NavLink to="/">View Storefront</NavLink>
         </nav>
 
         <div className="vendor-sidebar-user">
@@ -38,6 +38,14 @@ function VendorLayout() {
             <small>{user?.email || ""}</small>
           </span>
         </div>
+
+        <button
+          type="button"
+          className="vendor-sidebar-logout"
+          onClick={handleLogout}
+        >
+          Sign out
+        </button>
       </aside>
 
       <main className="vendor-main">
