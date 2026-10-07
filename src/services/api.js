@@ -35,17 +35,32 @@ export async function apiRequest(path, options = {}) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    method,
-    headers,
-  });
+  const timeoutSignal = AbortSignal.timeout(30000);
+  const signal = options.signal
+    ? AbortSignal.any([options.signal, timeoutSignal])
+    : timeoutSignal;
+  let response;
+  let text;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      method,
+      headers,
+      signal,
+    });
+    text = response.status === 204 ? "" : await response.text();
+  } catch (error) {
+    if (timeoutSignal.aborted && !options.signal?.aborted) {
+      throw new Error(
+        "The server is taking longer than expected. It may be waking up. Please try again shortly."
+      );
+    }
+    throw error;
+  }
 
   if (response.status === 204) {
     return null;
   }
-
-  const text = await response.text();
 
   let data = null;
 
