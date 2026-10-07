@@ -74,7 +74,7 @@ export async function apiRequest(path, options = {}) {
       clearStoredAuth();
 
       if (typeof window !== "undefined") {
-        window.location.assign("/login?expired=1");
+        window.location.assign("/#/login?expired=1");
       }
     }
 
