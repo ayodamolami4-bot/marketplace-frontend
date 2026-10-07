@@ -41,6 +41,37 @@
   text-transform: uppercase;
 }
 
+.vendor-store-identity {
+  display: grid;
+  gap: 3px;
+  margin: 0 8px 18px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.vendor-store-identity > span {
+  color: #8ea79a;
+  font-size: 0.52rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.vendor-store-identity > strong {
+  overflow: hidden;
+  color: white;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vendor-store-identity > small {
+  color: #d4a8a3;
+  font-size: 0.52rem;
+  line-height: 1.35;
+}
+
 .vendor-nav {
   display: grid;
   gap: 4px;
