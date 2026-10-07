@@ -39,7 +39,9 @@ function Orders() {
           localStorage.getItem("marketplace_order_ids") || "[]"
         );
 
-        const lastOrderId = localStorage.getItem("marketplace_last_order_id");
+        const lastOrderId = localStorage.getItem(
+          "marketplace_last_order_id"
+        );
 
         const ids = Array.from(
           new Set(
@@ -77,7 +79,8 @@ function Orders() {
 
         setOrders(validOrders);
         setSelectedOrderId(
-          queryOrderId && validOrders.some((order) => order.id === queryOrderId)
+          queryOrderId &&
+            validOrders.some((order) => order.id === queryOrderId)
             ? queryOrderId
             : validOrders[0]?.id || ""
         );
@@ -98,7 +101,8 @@ function Orders() {
   }, [searchParams]);
 
   const selectedOrder = useMemo(
-    () => orders.find((order) => order.id === selectedOrderId) || orders[0],
+    () =>
+      orders.find((order) => order.id === selectedOrderId) || orders[0],
     [orders, selectedOrderId]
   );
 
@@ -134,11 +138,11 @@ function Orders() {
         </div>
 
         <nav className="account-nav">
-          <Link to="/orders" className="active">
-            My Orders
-          </Link>
+          <Link to="/orders" className="active">My Orders</Link>
           <Link to="/wishlist">Wishlist</Link>
           <Link to="/notifications">Notifications</Link>
+          <Link to="/reviews">Reviews</Link>
+          <Link to="/sell">Become a Seller</Link>
           <Link to="/cart">Cart</Link>
           <Link to="/products">Continue Shopping</Link>
         </nav>
@@ -161,7 +165,7 @@ function Orders() {
 
         {!orders.length ? (
           <div className="account-empty">
-            <div className="account-empty-icon">□</div>
+            <div className="account-empty-icon">Orders</div>
             <h2>No orders yet</h2>
             <p>Your completed checkout orders will appear here.</p>
             <Link to="/products" className="primary-button">
@@ -173,7 +177,9 @@ function Orders() {
             <section className="orders-list-panel">
               <div className="orders-list-title">
                 <strong>Order History</strong>
-                <span>{orders.length} order{orders.length === 1 ? "" : "s"}</span>
+                <span>
+                  {orders.length} order{orders.length === 1 ? "" : "s"}
+                </span>
               </div>
 
               <div className="orders-list">
@@ -207,7 +213,9 @@ function Orders() {
                       </div>
 
                       <div className="order-list-right">
-                        <span className={`status-pill status-${order.status}`}>
+                        <span
+                          className={`status-pill status-${order.status}`}
+                        >
                           {friendlyStatus(order.status)}
                         </span>
                         <strong>{money(total)}</strong>
@@ -223,18 +231,29 @@ function Orders() {
                 <div className="order-detail-head">
                   <div>
                     <small>ORDER</small>
-                    <h2>#{selectedOrder.id.slice(0, 8).toUpperCase()}</h2>
+                    <h2>
+                      #{selectedOrder.id.slice(0, 8).toUpperCase()}
+                    </h2>
                     <p>
                       Placed{" "}
                       {new Date(selectedOrder.createdAt).toLocaleString()}
                     </p>
                   </div>
 
-                  <span
-                    className={`status-pill status-${selectedOrder.status}`}
-                  >
-                    {friendlyStatus(selectedOrder.status)}
-                  </span>
+                  <div className="order-detail-actions">
+                    <Link
+                      to={`/tracking?orderId=${selectedOrder.id}`}
+                      className="secondary-button"
+                    >
+                      Track Order
+                    </Link>
+
+                    <span
+                      className={`status-pill status-${selectedOrder.status}`}
+                    >
+                      {friendlyStatus(selectedOrder.status)}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="tracking-strip">
@@ -284,7 +303,9 @@ function Orders() {
                           <strong>{subOrder.vendorName}</strong>
                         </div>
 
-                        <span className={`status-pill status-${subOrder.status}`}>
+                        <span
+                          className={`status-pill status-${subOrder.status}`}
+                        >
                           {friendlyStatus(subOrder.status)}
                         </span>
                       </div>
@@ -296,7 +317,9 @@ function Orders() {
                             key={item.productId}
                           >
                             <div className="account-order-thumb">
-                              <span>{item.productName.charAt(0)}</span>
+                              <span>
+                                {item.productName.charAt(0)}
+                              </span>
                             </div>
 
                             <div>
