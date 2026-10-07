@@ -74,19 +74,7 @@ function Orders() {
     [orders, selectedOrderId]
   );
 
-  const orderTotal = useMemo(() => {
-    if (!selectedOrder) return 0;
-
-    return selectedOrder.subOrders?.reduce(
-      (sum, subOrder) =>
-        sum +
-        subOrder.items.reduce(
-          (itemSum, item) => itemSum + item.subtotal,
-          0
-        ),
-      0
-    );
-  }, [selectedOrder]);
+  const orderTotal = selectedOrder?.totalAmount ?? 0;
 
   if (loading) {
     return <div className="orders-state">Loading your account...</div>;
@@ -155,15 +143,7 @@ function Orders() {
 
               <div className="orders-list">
                 {orders.map((order) => {
-                  const total = order.subOrders?.reduce(
-                    (sum, subOrder) =>
-                      sum +
-                      subOrder.items.reduce(
-                        (itemSum, item) => itemSum + item.subtotal,
-                        0
-                      ),
-                    0
-                  );
+                  const total = order.totalAmount ?? 0;
 
                   return (
                     <button
@@ -308,6 +288,9 @@ function Orders() {
                   ))}
                 </div>
 
+                <div className="order-total-row"><span>Subtotal</span><strong>{money(selectedOrder.subtotal)}</strong></div>
+                <div className="order-total-row"><span>Discount</span><strong>−{money(selectedOrder.discountAmount)}</strong></div>
+                <div className="order-total-row"><span>Delivery</span><strong>{money(selectedOrder.shippingFee)}</strong></div>
                 <div className="order-total-row">
                   <span>Order Total</span>
                   <strong>{money(orderTotal)}</strong>

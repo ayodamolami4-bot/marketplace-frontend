@@ -83,10 +83,7 @@ function VendorOrders() {
         ) : (
           <div className="vendor-order-cards">
             {orders.map((order) => {
-              const total = order.items.reduce(
-                (sum, item) => sum + item.subtotal,
-                0
-              );
+              const total = order.totalAmount ?? 0;
 
               const canAdvance =
                 order.status === "pending_fulfillment" ||
@@ -126,7 +123,7 @@ function VendorOrders() {
 
                   <div className="vendor-order-bottom">
                     <span>
-                      Total <strong>{money(total)}</strong>
+                      Discount <strong>{money(order.discountAmount)}</strong> · Total <strong>{money(total)}</strong>
                     </span>
 
                     <button
