@@ -41,47 +41,9 @@ function Orders() {
         setLoading(true);
 
         const queryOrderId = searchParams.get("orderId");
-        const savedOrderIds = JSON.parse(
-          localStorage.getItem("marketplace_order_ids") || "[]"
-        );
-
-        const lastOrderId = localStorage.getItem(
-          "marketplace_last_order_id"
-        );
-
-        const ids = Array.from(
-          new Set(
-            [queryOrderId, lastOrderId, ...savedOrderIds].filter(Boolean)
-          )
-        );
-
-        if (!ids.length) {
-          if (active) {
-            setOrders([]);
-            setSelectedOrderId("");
-          }
-          return;
-        }
-
-        const responses = await Promise.all(
-          ids.map(async (id) => {
-            try {
-              return await apiRequest(`/orders/${id}`);
-            } catch {
-              return null;
-            }
-          })
-        );
-
+        const response = await apiRequest("/orders");
         if (!active) return;
-
-        const validOrders = responses
-          .filter(Boolean)
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() -
-              new Date(a.createdAt).getTime()
-          );
+        const validOrders = response?.data || [];
 
         setOrders(validOrders);
         setSelectedOrderId(
@@ -172,7 +134,7 @@ function Orders() {
 
         {error && <div className="form-error">{error}</div>}
 
-        {!orders.length ? (
+        {!orders.length && !error ? (
           <div className="account-empty">
             <div className="account-empty-icon">Orders</div>
             <h2>No orders yet</h2>
