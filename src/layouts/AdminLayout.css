@@ -103,6 +103,23 @@
   white-space: nowrap;
 }
 
+.admin-sidebar-logout {
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #d8e4dd;
+  padding: 9px 10px;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.admin-sidebar-logout:hover {
+  border-color: rgba(57, 205, 121, 0.45);
+  color: white;
+}
+
 .admin-main {
   min-width: 0;
   min-height: 100vh;
