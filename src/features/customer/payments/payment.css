@@ -281,6 +281,86 @@
   text-align: center;
 }
 
+.demo-payment-page {
+  width: min(100% - 32px, 760px);
+  margin: 0 auto;
+  padding: 56px 0 70px;
+}
+
+.demo-payment-card {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  border: 1px solid #dfe6e1;
+  border-radius: 12px;
+  background: white;
+  padding: clamp(28px, 6vw, 52px);
+  text-align: center;
+}
+
+.demo-payment-card h1 {
+  max-width: 560px;
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  letter-spacing: -0.045em;
+}
+
+.demo-payment-card > p:not(.eyebrow) {
+  max-width: 560px;
+  color: #6f7b74;
+  line-height: 1.6;
+}
+
+.demo-payment-reference {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+  border: 1px solid #e0e6e2;
+  border-radius: 8px;
+  background: #f8faf8;
+  padding: 13px;
+  text-align: left;
+}
+
+.demo-payment-reference span {
+  color: #7d8982;
+  font-size: 0.61rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.demo-payment-reference strong {
+  overflow-wrap: anywhere;
+  font-size: 0.72rem;
+}
+
+.demo-payment-card > button {
+  border: 0;
+  border-radius: 7px;
+  background: #20a75a;
+  color: white;
+  padding: 11px 16px;
+  font-size: 0.74rem;
+  font-weight: 900;
+}
+
+.demo-payment-card > a {
+  color: #178648;
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.demo-payment-mark {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8f7ed;
+  color: #178648;
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
 @media (max-width: 850px) {
   .payment-layout {
     grid-template-columns: 1fr;
@@ -292,7 +372,8 @@
 }
 
 @media (max-width: 620px) {
-  .payment-page {
+  .payment-page,
+  .demo-payment-page {
     width: min(100% - 20px, 1320px);
   }
 
