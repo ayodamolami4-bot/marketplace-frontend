@@ -153,7 +153,22 @@ function Payment() {
       );
 
       if (paymentMethod === "paystack" && response.paystack?.authorizationUrl) {
-        window.location.assign(response.paystack.authorizationUrl);
+        const authorizationUrl = new URL(
+          response.paystack.authorizationUrl,
+          window.location.origin
+        );
+        if (
+          authorizationUrl.origin === window.location.origin &&
+          (authorizationUrl.pathname === "/payment/demo" ||
+            authorizationUrl.hash.startsWith("#/payment/demo?"))
+        ) {
+          const route = authorizationUrl.hash.startsWith("#/")
+            ? authorizationUrl.hash.slice(1)
+            : `${authorizationUrl.pathname}${authorizationUrl.search}`;
+          navigate(route);
+        } else {
+          window.location.assign(authorizationUrl.href);
+        }
         return;
       }
 
