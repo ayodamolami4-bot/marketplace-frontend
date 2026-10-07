@@ -472,3 +472,27 @@
     font-size: 0.5rem;
   }
 }
+
+
+.order-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.order-detail-actions .secondary-button {
+  padding: 7px 10px;
+  font-size: 0.62rem;
+}
+
+@media (max-width: 580px) {
+  .order-detail-head {
+    display: grid;
+  }
+
+  .order-detail-actions {
+    justify-content: flex-start;
+  }
+}
