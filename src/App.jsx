@@ -33,6 +33,7 @@ import AdminUsers from "./features/admin/AdminUsers";
 import AdminVendors from "./features/admin/AdminVendors";
 import AdminCategories from "./features/admin/AdminCategories";
 import AdminReviews from "./features/admin/AdminReviews";
+import AdminNotifications from "./features/admin/AdminNotifications";
 
 function App() {
   return (
@@ -174,6 +175,7 @@ function App() {
         <Route path="vendors" element={<AdminVendors />} />
         <Route path="categories" element={<AdminCategories />} />
         <Route path="reviews" element={<AdminReviews />} />
+        <Route path="notifications" element={<AdminNotifications />} />
       </Route>
     </Routes>
   );
